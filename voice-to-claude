@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""
+Voice-to-Claude: Toggle-to-record voice input for Claude Code
+
+Usage:
+  voice-to-claude toggle  - Toggle recording on/off
+                           First press: start recording
+                           Second press: stop, transcribe, send to Claude
+"""
+
+import sys
+import os
+import subprocess
+import signal
+import requests
+import time
+
+# Add config directory to path
+sys.path.insert(0, os.path.expanduser("~/.config/voice-to-claude"))
+from config import WHISPER_SERVER, TMUX_SESSION, CLAUDE_COMMAND, AUDIO_RATE, TEMP_AUDIO
+
+PID_FILE = "/tmp/voice-to-claude.pid"
+
+
+def notify(title, message, urgency="normal"):
+    """Send desktop notification."""
+    subprocess.run([
+        "notify-send", "-u", urgency, "-t", "2000", title, message
+    ], check=False)
+
+
+def is_recording():
+    """Check if we're currently recording."""
+    return os.path.exists(PID_FILE)
+
+
+def start_recording():
+    """Start recording audio in the background."""
+    # Start parecord in background
+    proc = subprocess.Popen([
+        "parecord",
+        "--rate", str(AUDIO_RATE),
+        "--channels", "1",
+        "--file-format=wav",
+        TEMP_AUDIO
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # Save PID
+    with open(PID_FILE, "w") as f:
+        f.write(str(proc.pid))
+
+    notify("Recording", "Press mod+F1 again to stop...")
+
+
+def stop_recording():
+    """Stop the recording process."""
+    if not os.path.exists(PID_FILE):
+        return False
+
+    try:
+        with open(PID_FILE) as f:
+            pid = int(f.read().strip())
+        os.kill(pid, signal.SIGTERM)
+        time.sleep(0.1)  # Give it a moment to write final data
+    except (ProcessLookupError, ValueError, FileNotFoundError):
+        pass
+
+    try:
+        os.unlink(PID_FILE)
+    except FileNotFoundError:
+        pass
+
+    return True
+
+
+def transcribe_audio():
+    """Send audio to whisper server and get text back."""
+    if not os.path.exists(TEMP_AUDIO):
+        notify("Error", "No audio file found", "critical")
+        return None
+
+    # Check file size (skip if too small)
+    if os.path.getsize(TEMP_AUDIO) < 1000:
+        notify("Error", "Recording too short", "critical")
+        return None
+
+    try:
+        with open(TEMP_AUDIO, "rb") as f:
+            response = requests.post(
+                WHISPER_SERVER,
+                files={"audio": f},
+                timeout=30
+            )
+
+        if response.status_code == 200:
+            return response.json().get("text", "").strip()
+        else:
+            notify("Error", f"Server error: {response.status_code}", "critical")
+            return None
+    except requests.exceptions.ConnectionError:
+        notify("Error", "Cannot connect to whisper server", "critical")
+        return None
+    except Exception as e:
+        notify("Error", str(e), "critical")
+        return None
+
+
+def tmux_session_exists(session):
+    """Check if a tmux session exists."""
+    result = subprocess.run(
+        ["tmux", "has-session", "-t", session],
+        capture_output=True
+    )
+    return result.returncode == 0
+
+
+def send_to_claude(text):
+    """Send text to Claude Code in tmux session."""
+    if tmux_session_exists(TMUX_SESSION):
+        # Session exists - send text literally, then Enter separately
+        subprocess.run([
+            "tmux", "send-keys", "-t", TMUX_SESSION, "-l", text
+        ], check=False)
+
+        time.sleep(0.05)
+
+        subprocess.run([
+            "tmux", "send-keys", "-t", TMUX_SESSION, "Enter"
+        ], check=False)
+
+        notify("Sent to Claude", text[:50] + "..." if len(text) > 50 else text)
+    else:
+        # No session, open new terminal with clauded
+        subprocess.Popen([
+            "alacritty", "-e", "tmux", "new-session", "-s", TMUX_SESSION,
+            CLAUDE_COMMAND
+        ], env={**os.environ, "DISPLAY": ":0"})
+
+        # Wait for session to be ready
+        for _ in range(20):
+            time.sleep(0.1)
+            if tmux_session_exists(TMUX_SESSION):
+                break
+
+        time.sleep(1)  # Give Claude Code a moment to start
+
+        # Send text literally, then Enter
+        subprocess.run([
+            "tmux", "send-keys", "-t", TMUX_SESSION, "-l", text
+        ], check=False)
+
+        time.sleep(0.05)
+
+        subprocess.run([
+            "tmux", "send-keys", "-t", TMUX_SESSION, "Enter"
+        ], check=False)
+
+        notify("Started Claude", text[:50] + "..." if len(text) > 50 else text)
+
+
+def toggle():
+    """Toggle recording state."""
+    if is_recording():
+        # Currently recording -> stop and process
+        stop_recording()
+        notify("Processing", "Transcribing audio...")
+
+        text = transcribe_audio()
+
+        if text:
+            send_to_claude(text)
+        else:
+            notify("Error", "No transcription received", "critical")
+
+        # Clean up audio file
+        try:
+            os.unlink(TEMP_AUDIO)
+        except FileNotFoundError:
+            pass
+    else:
+        # Not recording -> start
+        start_recording()
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: voice-to-claude toggle")
+        sys.exit(1)
+
+    cmd = sys.argv[1]
+
+    if cmd == "toggle":
+        toggle()
+    elif cmd == "start":
+        if not is_recording():
+            start_recording()
+    elif cmd == "stop":
+        if is_recording():
+            stop_recording()
+            notify("Stopped", "Recording cancelled")
+            try:
+                os.unlink(TEMP_AUDIO)
+            except FileNotFoundError:
+                pass
+    else:
+        print(f"Unknown command: {cmd}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
