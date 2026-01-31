@@ -1,0 +1,40 @@
+#!/bin/bash
+# WiFi menu using rofi + nmcli
+
+# Get current connection
+CURRENT=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+
+# Scan and list networks
+notify-send "WiFi" "Scanning networks..."
+nmcli dev wifi rescan 2>/dev/null
+sleep 1
+
+NETWORKS=$(nmcli -t -f ssid,signal,security dev wifi list | grep -v '^--' | sort -t: -k2 -nr | \
+    awk -F: '{
+        if ($1 != "") {
+            sec = ($3 != "") ? " 󰌾" : "";
+            signal = $2;
+            icon = (signal > 75) ? "󰤨" : (signal > 50) ? "󰤥" : (signal > 25) ? "󰤢" : "󰤟";
+            cur = ($1 == "'"$CURRENT"'") ? " *" : "";
+            printf "%s %s %s%%%s%s\n", icon, $1, signal, sec, cur
+        }
+    }' | uniq)
+
+# Add options
+OPTIONS="󰖩 Enable WiFi\n󰖪 Disable WiFi\n───────────\n$NETWORKS"
+
+CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -i -p "WiFi" -theme-str 'window {width: 300px;}')
+
+case "$CHOICE" in
+    *"Enable WiFi") nmcli radio wifi on ;;
+    *"Disable WiFi") nmcli radio wifi off ;;
+    *───*) ;;
+    *)
+        SSID=$(echo "$CHOICE" | sed 's/^[^ ]* //' | sed 's/ [0-9]*%.*$//')
+        if [ -n "$SSID" ]; then
+            # Try to connect (will prompt for password if needed)
+            nmcli dev wifi connect "$SSID" || \
+            alacritty -e nmcli dev wifi connect "$SSID" --ask
+        fi
+        ;;
+esac

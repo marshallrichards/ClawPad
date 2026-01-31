@@ -13,4 +13,23 @@ I find having the agent keep things simple and default to use existing programs 
 
 For my own system I am using Debian 13 to provide a stable base and i3wm to provide a really simple window manager that Claude can interact with using the CLI.
 
+## OS Configuration & Installer
 
+The `OS/` folder contains a complete i3wm desktop environment configuration and installer script. It's designed to quickly set up a great environment for running AI agents on older ThinkPads (or any Linux machine).
+
+**Features:**
+- i3wm with gaps, vim-style keybindings, and JetBrains dark theme
+- Rofi-powered menus for WiFi, Bluetooth, power, clipboard, calculator, emoji picker
+- Modern CLI tools (eza, bat, ripgrep, fd, fzf) with sensible aliases
+- Optional LazyVim neovim configuration (with heavy plugins disabled for older hardware)
+- Distro-agnostic: works on Debian, Ubuntu, and Arch Linux
+
+**Quick start:**
+```bash
+cd OS/
+./install.sh          # Base installation
+./install.sh -o       # Include optional packages (media, office, dev tools)
+./install.sh --nvim   # Include neovim configuration
+```
+
+See `OS/README.md` for full documentation.

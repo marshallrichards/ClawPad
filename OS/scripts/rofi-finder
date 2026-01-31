@@ -1,0 +1,7 @@
+#!/bin/bash
+# Find files with rofi + fd
+
+FILE=$(fdfind --type f --hidden --exclude .git --exclude node_modules ~ 2>/dev/null | \
+    rofi -dmenu -i -p "Find" -theme-str 'window {width: 60%;}')
+
+[ -n "$FILE" ] && xdg-open "$FILE"

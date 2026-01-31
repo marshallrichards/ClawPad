@@ -1,0 +1,58 @@
+# ClawPad-OS bash additions
+# This content gets appended to ~/.bashrc during installation
+
+# Local bin path
+export PATH="$HOME/.local/bin:$PATH"
+
+# Editor
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+# Aliases - editors
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
+
+# Aliases - modern CLI tools
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --group-directories-first'
+alias la='eza -a --icons --group-directories-first'
+alias lt='eza --tree --icons --level=2'
+alias cat='bat --style=plain'
+alias grep='rg'
+
+# Aliases - safety
+alias rm='trash-put'
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias mkdir='mkdir -pv'
+
+# fzf configuration
+export FZF_DEFAULT_COMMAND='fdfind --type f --hidden --exclude .git 2>/dev/null || fd --type f --hidden --exclude .git'
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# fzf keybindings (distro-agnostic paths)
+[[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]] && source /usr/share/doc/fzf/examples/key-bindings.bash
+[[ -f /usr/share/fzf/key-bindings.bash ]] && source /usr/share/fzf/key-bindings.bash
+
+# Quick cd with fzf
+fcd() {
+    local cmd="fdfind --type d --hidden --exclude .git 2>/dev/null || fd --type d --hidden --exclude .git"
+    local dir
+    dir=$(eval "$cmd" | fzf --preview 'eza --tree --level=1 {} 2>/dev/null || ls {}') && cd "$dir"
+}
+
+# Quick file open with fzf
+fo() {
+    local cmd="fdfind --type f --hidden --exclude .git 2>/dev/null || fd --type f --hidden --exclude .git"
+    local file
+    file=$(eval "$cmd" | fzf --preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || head -100 {}') && xdg-open "$file"
+}
+
+# Quick edit with fzf
+fe() {
+    local cmd="fdfind --type f --hidden --exclude .git 2>/dev/null || fd --type f --hidden --exclude .git"
+    local file
+    file=$(eval "$cmd" | fzf --preview 'bat --color=always --style=numbers --line-range=:500 {} 2>/dev/null || head -100 {}') && ${EDITOR:-vim} "$file"
+}

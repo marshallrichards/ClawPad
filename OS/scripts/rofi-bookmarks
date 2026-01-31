@@ -1,0 +1,16 @@
+#!/bin/bash
+# Bookmarks launcher using rofi
+
+BOOKMARKS_FILE=~/.config/rofi/bookmarks.txt
+
+if [ ! -f "$BOOKMARKS_FILE" ]; then
+    notify-send "Bookmarks" "No bookmarks file found"
+    exit 1
+fi
+
+CHOICE=$(cat "$BOOKMARKS_FILE" | rofi -dmenu -i -p "Bookmarks" -theme-str 'window {width: 400px;}')
+
+if [ -n "$CHOICE" ]; then
+    URL=$(echo "$CHOICE" | sed 's/^.* | //')
+    xdg-open "$URL"
+fi

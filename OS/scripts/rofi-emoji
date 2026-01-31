@@ -1,0 +1,88 @@
+#!/bin/bash
+# Emoji picker using rofi
+
+EMOJI_FILE=~/.local/share/rofi-emoji.txt
+
+# Create emoji file if not exists
+if [ ! -f "$EMOJI_FILE" ]; then
+    mkdir -p ~/.local/share
+    cat > "$EMOJI_FILE" << 'EMOJIS'
+😀 grinning face
+😂 face with tears of joy
+🤣 rolling on the floor laughing
+😊 smiling face with smiling eyes
+😍 smiling face with heart-eyes
+🥰 smiling face with hearts
+😘 face blowing a kiss
+🤔 thinking face
+🤨 face with raised eyebrow
+😐 neutral face
+😑 expressionless face
+🙄 face with rolling eyes
+😬 grimacing face
+😮 face with open mouth
+😲 astonished face
+😳 flushed face
+😱 face screaming in fear
+😨 fearful face
+😰 anxious face with sweat
+😢 crying face
+😭 loudly crying face
+😤 face with steam from nose
+😡 pouting face
+🤬 face with symbols on mouth
+👍 thumbs up
+👎 thumbs down
+👌 OK hand
+✌️ victory hand
+🤞 crossed fingers
+🤟 love-you gesture
+🤘 sign of the horns
+👋 waving hand
+🙏 folded hands
+💪 flexed biceps
+❤️ red heart
+🧡 orange heart
+💛 yellow heart
+💚 green heart
+💙 blue heart
+💜 purple heart
+🖤 black heart
+🤍 white heart
+💔 broken heart
+🔥 fire
+⭐ star
+✨ sparkles
+💯 hundred points
+✅ check mark button
+❌ cross mark
+❓ question mark
+❗ exclamation mark
+💡 light bulb
+🎉 party popper
+🎊 confetti ball
+🚀 rocket
+💻 laptop
+⌨️ keyboard
+🖥️ desktop computer
+📱 mobile phone
+📧 e-mail
+📁 file folder
+📂 open file folder
+🔒 locked
+🔓 unlocked
+🔑 key
+⚙️ gear
+🔧 wrench
+🛠️ hammer and wrench
+EMOJIS
+fi
+
+# Select emoji
+SELECTION=$(cat "$EMOJI_FILE" | rofi -dmenu -i -p "Emoji" -theme-str 'window {width: 300px;}')
+
+if [ -n "$SELECTION" ]; then
+    EMOJI=$(echo "$SELECTION" | cut -d' ' -f1)
+    echo -n "$EMOJI" | xclip -selection clipboard
+    notify-send "Emoji" "$EMOJI copied to clipboard"
+fi

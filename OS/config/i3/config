@@ -1,0 +1,319 @@
+# i3 config - LARBS-inspired for Debian 13
+# vim: filetype=i3config
+
+# Mod key (Super/Windows key)
+set $mod Mod4
+set $alt Mod1
+
+# Font
+font pango:JetBrainsMono Nerd Font 10
+
+# JetBrains Dark theme colors (New UI 2024+)
+set $bg       #1e1f22
+set $fg       #bcbec4
+set $red      #f75464
+set $green    #499c54
+set $yellow   #e9b872
+set $blue     #3574f0
+set $purple   #c77dbb
+set $aqua     #35a1b0
+set $gray     #6f737a
+set $darkgray #2b2d30
+set $orange   #cf8e6d
+
+# Window colors
+#                       border    bg        text      indicator child_border
+client.focused          $blue     $blue     $darkgray $purple   $blue
+client.focused_inactive $darkgray $darkgray $gray     $purple   $darkgray
+client.unfocused        $darkgray $darkgray $gray     $purple   $darkgray
+client.urgent           $red      $red      $fg       $red      $red
+
+# Gaps (LARBS style)
+gaps inner 10
+gaps outer 5
+smart_gaps on
+
+# Borders
+default_border pixel 2
+default_floating_border pixel 2
+smart_borders no_gaps
+
+# Hide edge borders only when there's one window AND no gaps
+hide_edge_borders smart_no_gaps
+
+# Force borders on terminals (ensure highlight visible when focused)
+for_window [class="Alacritty"] border pixel 2
+for_window [class="kitty"] border pixel 2
+for_window [class="URxvt"] border pixel 2
+for_window [class="XTerm"] border pixel 2
+for_window [class="st-256color"] border pixel 2
+for_window [class="Termite"] border pixel 2
+for_window [class="Gnome-terminal"] border pixel 2
+for_window [class="konsole"] border pixel 2
+
+# ===== AUTOSTART =====
+
+# Caps Lock → Escape (tap) / Super (hold) - LARBS style
+exec --no-startup-id setxkbmap -option caps:super
+exec --no-startup-id killall xcape 2>/dev/null; xcape -e 'Super_L=Escape'
+
+exec --no-startup-id picom -b
+exec --no-startup-id dunst
+exec --no-startup-id feh --bg-scale ~/.config/i3/wallpaper.png
+exec --no-startup-id nm-applet
+exec --no-startup-id ~/go/bin/trayscale --hide-window
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock -c 1e1f22
+
+# USB auto-mount
+exec --no-startup-id udiskie --tray
+
+# Clipboard manager daemon
+exec --no-startup-id clipmenud
+
+# ===== BASIC KEYBINDINGS =====
+
+# Terminal (LARBS uses $mod+Return)
+bindsym $mod+Return exec --no-startup-id alacritty
+
+# Kill focused window
+bindsym $mod+q kill
+
+# Application launcher (rofi)
+bindsym $mod+d exec --no-startup-id rofi -show drun -show-icons
+bindsym $mod+Shift+d exec --no-startup-id rofi -show run
+
+# File manager
+bindsym $mod+Shift+f exec --no-startup-id pcmanfm
+
+# Browser (change to your preferred)
+bindsym $mod+w exec --no-startup-id firefox || firefox-esr || chromium
+
+# Ranger file manager (terminal)
+bindsym $mod+n exec --no-startup-id alacritty -e ranger
+
+# btop system monitor
+bindsym $mod+b exec --no-startup-id alacritty -e btop
+
+# ===== ROFI POWER TOOLS =====
+
+# Power menu (shutdown/reboot/suspend/lock/logout)
+bindsym $mod+Shift+x exec --no-startup-id ~/.local/bin/powermenu
+
+# Clipboard history
+bindsym $mod+c exec --no-startup-id clipmenu
+
+# File finder (fzf-style)
+bindsym $mod+o exec --no-startup-id ~/.local/bin/rofi-finder
+
+# Content search (ripgrep)
+bindsym $mod+slash exec --no-startup-id ~/.local/bin/rofi-search
+
+# WiFi menu
+bindsym $mod+i exec --no-startup-id ~/.local/bin/rofi-wifi
+
+# Bluetooth menu
+bindsym $mod+Shift+b exec --no-startup-id ~/.local/bin/rofi-bluetooth
+
+# Calculator
+bindsym $mod+equal exec --no-startup-id ~/.local/bin/rofi-calc
+
+# Emoji picker
+bindsym $mod+period exec --no-startup-id ~/.local/bin/rofi-emoji
+
+# Bookmarks
+bindsym $mod+grave exec --no-startup-id ~/.local/bin/rofi-bookmarks
+
+# Window switcher
+bindsym $alt+Tab exec --no-startup-id rofi -show window -show-icons
+
+# ===== VIM-LIKE NAVIGATION (LARBS style) =====
+
+# Change focus (hjkl)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Arrow keys also work
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move focused window (Shift + hjkl)
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Arrow keys
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# ===== SPLIT ORIENTATION =====
+bindsym $mod+v split toggle
+
+# Fullscreen
+bindsym $mod+f fullscreen toggle
+
+# Toggle floating
+bindsym $mod+Shift+space floating toggle
+
+# Focus floating/tiling
+bindsym $mod+space focus mode_toggle
+
+# Focus parent
+bindsym $mod+a focus parent
+
+# Sticky window
+bindsym $mod+Shift+s sticky toggle
+
+# ===== LAYOUTS =====
+bindsym $mod+s layout stacking
+bindsym $mod+t layout tabbed
+bindsym $mod+e layout toggle split
+
+# ===== WORKSPACES =====
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# Switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+# Move container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# ===== RESIZE MODE =====
+mode "resize" {
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
+
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# ===== GAPS CONTROL =====
+bindsym $mod+Shift+g gaps inner current set 0; gaps outer current set 0
+bindsym $mod+g gaps inner current set 10; gaps outer current set 5
+
+bindsym $mod+z gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+
+# ===== SYSTEM KEYBINDINGS =====
+
+# Reload config
+bindsym $mod+Shift+c reload
+
+# Restart i3
+bindsym $mod+Shift+r restart
+
+# Exit i3
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes' 'i3-msg exit'"
+
+# Lock screen
+bindsym $mod+x exec --no-startup-id i3lock -c 1e1f22
+
+# ===== MEDIA KEYS =====
+
+# Volume (pamixer)
+bindsym XF86AudioRaiseVolume exec --no-startup-id sh -c 'pamixer -i 5 && notify-send "Volume: $(pamixer --get-volume)%"'
+bindsym XF86AudioLowerVolume exec --no-startup-id sh -c 'pamixer -d 5 && notify-send "Volume: $(pamixer --get-volume)%"'
+bindsym XF86AudioMute exec --no-startup-id sh -c 'pamixer -t && notify-send "Mute toggled"'
+
+# Brightness (brightnessctl)
+bindsym XF86MonBrightnessUp exec --no-startup-id ~/.local/bin/brightness-up
+bindsym XF86MonBrightnessDown exec --no-startup-id ~/.local/bin/brightness-down
+
+# ===== SCREENSHOTS (LARBS style) =====
+# Full screen
+bindsym Print exec --no-startup-id sh -c 'maim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send "Screenshot saved"'
+# Selection
+bindsym Shift+Print exec --no-startup-id sh -c 'maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png && notify-send "Screenshot saved"'
+# Selection to clipboard
+bindsym $mod+Print exec --no-startup-id sh -c 'maim -s | xclip -selection clipboard -t image/png && notify-send "Screenshot copied"'
+
+# ===== SCRATCHPAD =====
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+# ===== FLOATING RULES =====
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [class="Pavucontrol"] floating enable
+for_window [class="Lxappearance"] floating enable
+for_window [class="Nm-connection-editor"] floating enable
+for_window [class="feh"] floating enable
+
+# ===== BAR =====
+bar {
+    status_command i3status
+    position top
+    font pango:JetBrainsMono Nerd Font 9
+    separator_symbol " | "
+
+    colors {
+        background $bg
+        statusline $fg
+        separator  $gray
+
+        #                  border    bg        text
+        focused_workspace  $blue     $blue     $darkgray
+        active_workspace   $darkgray $darkgray $fg
+        inactive_workspace $darkgray $darkgray $gray
+        urgent_workspace   $red      $red      $fg
+    }
+}
+
+# Additional autostart (added by setup script)
+exec --no-startup-id lxpolkit
+exec --no-startup-id blueman-applet
+# exec --no-startup-id redshift-gtk  # Uncomment for night light
+
+# Media player controls
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+
+# Voice-to-Claude (toggle: press to start recording, press again to stop and send)
+bindsym $mod+F1 exec --no-startup-id ~/.local/bin/voice-to-claude toggle
+
+# Display management
+bindsym $mod+p exec --no-startup-id arandr

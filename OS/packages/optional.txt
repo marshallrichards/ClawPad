@@ -1,0 +1,42 @@
+# ClawPad-OS Optional Packages
+# These are nice-to-have packages that aren't strictly required
+
+# === Media ===
+vlc
+mpv
+yt-dlp
+ffmpeg
+imagemagick
+
+# === Documents & Office ===
+libreoffice
+zathura
+zathura-pdf
+pandoc
+
+# === Graphics & CAD ===
+inkscape
+openscad
+graphviz
+
+# === Development (full) ===
+gcc
+g++
+make
+cmake
+nodejs
+npm
+go
+java
+
+# === Embedded / Hardware ===
+i2c-tools
+avrdude
+avr-gcc
+avr-libc
+
+# === TTS ===
+espeak
+
+# === Browser ===
+firefox

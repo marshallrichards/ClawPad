@@ -1,0 +1,57 @@
+#!/bin/bash
+# Bluetooth menu using rofi + bluetoothctl
+
+# Check if bluetooth is on
+BT_STATUS=$(bluetoothctl show | grep "Powered:" | awk '{print $2}')
+
+if [ "$BT_STATUS" = "yes" ]; then
+    TOGGLE="󰂲 Disable Bluetooth"
+else
+    TOGGLE="󰂯 Enable Bluetooth"
+fi
+
+# Get paired devices
+PAIRED=$(bluetoothctl devices Paired | while read -r _ MAC NAME; do
+    CONNECTED=$(bluetoothctl info "$MAC" 2>/dev/null | grep "Connected: yes")
+    if [ -n "$CONNECTED" ]; then
+        echo "󰂱 $NAME (connected)"
+    else
+        echo "󰂳 $NAME"
+    fi
+done)
+
+# Get available devices
+AVAILABLE=$(bluetoothctl devices | while read -r _ MAC NAME; do
+    echo "󰂴 $NAME"
+done)
+
+OPTIONS="$TOGGLE\n󰂰 Scan for devices\n───────────\n$PAIRED\n$AVAILABLE"
+
+CHOICE=$(echo -e "$OPTIONS" | grep -v '^$' | rofi -dmenu -i -p "Bluetooth" -theme-str 'window {width: 300px;}')
+
+case "$CHOICE" in
+    *"Enable Bluetooth") bluetoothctl power on ;;
+    *"Disable Bluetooth") bluetoothctl power off ;;
+    *"Scan for devices")
+        notify-send "Bluetooth" "Scanning for devices..."
+        bluetoothctl scan on &
+        sleep 5
+        kill $!
+        exec ~/.local/bin/rofi-bluetooth
+        ;;
+    *───*) ;;
+    *)
+        DEVICE=$(echo "$CHOICE" | sed 's/^[^ ]* //' | sed 's/ (connected)$//')
+        MAC=$(bluetoothctl devices | grep "$DEVICE" | awk '{print $2}')
+        if [ -n "$MAC" ]; then
+            if echo "$CHOICE" | grep -q "connected"; then
+                bluetoothctl disconnect "$MAC"
+                notify-send "Bluetooth" "Disconnected from $DEVICE"
+            else
+                bluetoothctl connect "$MAC" && \
+                notify-send "Bluetooth" "Connected to $DEVICE" || \
+                notify-send "Bluetooth" "Failed to connect"
+            fi
+        fi
+        ;;
+esac

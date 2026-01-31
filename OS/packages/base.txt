@@ -1,0 +1,75 @@
+# ClawPad-OS Base Packages
+# These are the core packages needed for the i3 desktop environment
+# Package names here are "base" names that get translated per-distro
+
+# === Window Manager & Desktop ===
+i3
+i3status
+i3lock
+picom
+rofi
+dunst
+feh
+arandr
+xss-lock
+
+# === Terminal ===
+alacritty
+tmux
+
+# === Editors ===
+neovim
+
+# === File Management ===
+pcmanfm
+ranger
+udiskie
+
+# === CLI Utilities ===
+ripgrep
+fd
+fzf
+bat
+htop
+btop
+jq
+curl
+wget
+tree
+eza
+trash-cli
+
+# === Screenshots & Clipboard ===
+maim
+xclip
+clipmenu
+
+# === Networking ===
+network-manager
+nm-applet
+
+# === Bluetooth ===
+blueman
+bluez
+
+# === Audio ===
+pulseaudio
+pamixer
+pavucontrol
+
+# === System ===
+brightnessctl
+xcape
+xdotool
+polkit
+zenity
+
+# === Fonts ===
+font-jetbrains
+font-noto
+font-awesome
+
+# === Development (minimal) ===
+git
+python
+pip

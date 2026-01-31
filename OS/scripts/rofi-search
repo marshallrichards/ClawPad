@@ -1,0 +1,10 @@
+#!/bin/bash
+# Search file contents with rofi + ripgrep
+
+QUERY=$(rofi -dmenu -p "Search" -theme-str 'window {width: 400px;}')
+[ -z "$QUERY" ] && exit 0
+
+RESULT=$(rg --files-with-matches --hidden --glob '!.git' "$QUERY" ~ 2>/dev/null | \
+    rofi -dmenu -i -p "Results" -theme-str 'window {width: 60%;}')
+
+[ -n "$RESULT" ] && alacritty -e nvim "+/$QUERY" "$RESULT"

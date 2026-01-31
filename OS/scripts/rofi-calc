@@ -1,0 +1,28 @@
+#!/bin/bash
+# Calculator using rofi + bc
+
+HISTORY_FILE=~/.cache/rofi-calc-history
+
+while true; do
+    EXPR=$(rofi -dmenu -p "Calc" -theme-str 'window {width: 300px;}' < "$HISTORY_FILE" 2>/dev/null)
+    [ -z "$EXPR" ] && exit 0
+
+    # Calculate result
+    RESULT=$(echo "scale=6; $EXPR" | bc -l 2>/dev/null)
+
+    if [ -n "$RESULT" ]; then
+        # Remove trailing zeros
+        RESULT=$(echo "$RESULT" | sed 's/\.0*$//; s/\(\.[0-9]*[1-9]\)0*$/\1/')
+
+        # Copy to clipboard
+        echo -n "$RESULT" | xclip -selection clipboard
+
+        # Save to history
+        echo "$EXPR = $RESULT" >> "$HISTORY_FILE"
+        tail -20 "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+
+        notify-send "Calculator" "$EXPR = $RESULT (copied)"
+    else
+        notify-send "Calculator" "Error in expression"
+    fi
+done

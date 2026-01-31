@@ -1,0 +1,129 @@
+# Package name mappings
+# Format: base_name:debian_name:ubuntu_name:arch_name
+# Empty field means same as previous or base name
+# Lines starting with # are comments
+
+# File utilities
+fd:fd-find:fd-find:fd
+bat:bat:bat:bat
+ripgrep:ripgrep:ripgrep:ripgrep
+
+# Terminal
+alacritty:alacritty:alacritty:alacritty
+
+# Editors
+neovim:neovim:neovim:neovim
+
+# Java
+java:default-jdk:default-jdk:jdk-openjdk
+
+# Node.js
+nodejs:nodejs:nodejs:nodejs
+npm:npm:npm:npm
+
+# Python
+python:python3:python3:python
+pip:python3-pip:python3-pip:python-pip
+
+# Fonts
+font-jetbrains:fonts-jetbrains-mono:fonts-jetbrains-mono:ttf-jetbrains-mono
+font-noto:fonts-noto:fonts-noto:noto-fonts
+font-awesome:fonts-font-awesome:fonts-font-awesome:ttf-font-awesome
+
+# i3 and desktop
+i3:i3:i3:i3-wm
+i3status:i3status:i3status:i3status
+i3lock:i3lock:i3lock:i3lock
+picom:picom:picom:picom
+rofi:rofi:rofi:rofi
+dunst:dunst:dunst:dunst
+feh:feh:feh:feh
+
+# System utilities
+brightnessctl:brightnessctl:brightnessctl:brightnessctl
+xcape:xcape:xcape:xcape
+xdotool:xdotool:xdotool:xdotool
+xclip:xclip:xclip:xclip
+maim:maim:maim:maim
+
+# Networking
+network-manager:network-manager:network-manager:networkmanager
+nm-applet:network-manager-gnome:network-manager-gnome:network-manager-applet
+
+# Bluetooth
+blueman:blueman:blueman:blueman
+bluez:bluez:bluez:bluez
+
+# Audio
+pulseaudio:pulseaudio:pulseaudio:pulseaudio
+pamixer:pamixer:pamixer:pamixer
+pavucontrol:pavucontrol:pavucontrol:pavucontrol
+
+# File managers
+pcmanfm:pcmanfm:pcmanfm:pcmanfm
+ranger:ranger:ranger:ranger
+udiskie:udiskie:udiskie:udiskie
+
+# Media
+vlc:vlc:vlc:vlc
+mpv:mpv:mpv:mpv
+ffmpeg:ffmpeg:ffmpeg:ffmpeg
+imagemagick:imagemagick:imagemagick:imagemagick
+yt-dlp:yt-dlp:yt-dlp:yt-dlp
+
+# Documents
+libreoffice:libreoffice:libreoffice:libreoffice
+zathura:zathura:zathura:zathura
+zathura-pdf:zathura-pdf-poppler:zathura-pdf-poppler:zathura-pdf-poppler
+pandoc:pandoc:pandoc:pandoc
+
+# Graphics
+inkscape:inkscape:inkscape:inkscape
+openscad:openscad:openscad:openscad
+graphviz:graphviz:graphviz:graphviz
+
+# Development
+git:git:git:git
+gcc:gcc:gcc:gcc
+g++:g++:g++:gcc
+make:make:make:make
+cmake:cmake:cmake:cmake
+go:golang:golang:go
+
+# CLI tools
+htop:htop:htop:htop
+btop:btop:btop:btop
+tmux:tmux:tmux:tmux
+jq:jq:jq:jq
+curl:curl:curl:curl
+wget:wget:wget:wget
+tree:tree:tree:tree
+fzf:fzf:fzf:fzf
+
+# Clipboard
+clipmenu:clipmenu:clipmenu:clipmenu
+
+# Polkit
+polkit:lxpolkit:lxpolkit:polkit
+
+# Screen locker integration
+xss-lock:xss-lock:xss-lock:xss-lock
+
+# Trash CLI
+trash-cli:trash-cli:trash-cli:trash-cli
+
+# exa/eza (ls replacement)
+eza:eza:eza:eza
+
+# Embedded/hardware
+i2c-tools:i2c-tools:i2c-tools:i2c-tools
+avrdude:avrdude:avrdude:avrdude
+avr-gcc:gcc-avr:gcc-avr:avr-gcc
+avr-libc:avr-libc:avr-libc:avr-libc
+
+# TTS
+espeak:espeak-ng:espeak-ng:espeak-ng
+
+# Dialogs
+zenity:zenity:zenity:zenity
+yad:yad:yad:yad
